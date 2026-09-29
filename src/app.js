@@ -6,6 +6,7 @@
 const express = require("express");
 const urlRoutes = require("./routes/url.routes");
 require("dotenv").config();
+const PORT = process.env.PORT || 8181;
 
 const app = express();
 
@@ -14,6 +15,16 @@ app.use(express.json())
 
 // Register Routes
 app.use("/api/url", urlRoutes);
+
+// Add a health check endpoint
+app.get("/health", (req, res) => {
+    res.json({
+        status: "UP",
+        message: "Service is running",
+        instance: `server-${PORT}`,
+        port: PORT
+    });
+});
 
 // Error Handler
 const errorMiddleware = require("./middlewares/error.middleware");

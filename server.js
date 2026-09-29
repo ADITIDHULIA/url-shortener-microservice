@@ -9,7 +9,8 @@ const PORT = process.env.PORT || 4000;
 (async () => {
     await connectMongoDB();
     await connectRedis();
-    app.listen(PORT, () => {
+    // "0.0.0.0 allows Node to accept connections through the machine network interface"
+    app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server Started at PORT : ${PORT}`);
     });
 })();
