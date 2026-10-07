@@ -21,7 +21,7 @@ exports.createShortUrl = async(originalUrl) => {
     console.log("Short code generated:",shortCode);
     await respository.updatedCode(id, shortCode);
     return {
-        shortuRL : `http://localhost:8181/api/url/${shortCode}`
+        shortuRL : `http://localhost:8080/api/url/${shortCode}`
     }
 };
 
@@ -29,22 +29,31 @@ exports.createShortUrl = async(originalUrl) => {
 // Implement CACHE-ASIDE Pattern
 
 exports.getOriginalUrl = async (code) => {
-    // 1. Check Redis first (HOT Path)
     const cachedURL = await client.get(code);
-    if(cachedURL) {
+
+    if (cachedURL) {
         console.log("Cache hit for code:", code);
+        await respository.recordAccess(code);
         return cachedURL;
     }
+
     console.log("Cache Miss...");
 
-    // 2. If not in cache, fetch from Mongo DB
     const data = await respository.findByCode(code);
 
-    if (!data) throw new Error ("URL Not Found...");
+    if (!data) {
+        throw new Error("URL Not Found...");
+    }
 
-    // 3. Cache the result in Redis (COLD Path)
+    await respository.recordAccess(code);
+
     await client.set(code, data.originalUrl);
+
     console.log("Cached URL in Redis for code:", code);
-    
+
     return data.originalUrl;
-}
+};
+
+exports.getAnalytics = async (code) => {
+    return await respository.findByCode(code);
+};

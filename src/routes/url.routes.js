@@ -4,10 +4,10 @@ const express = require("express");
 const router = express.Router();
 const controller = require('../controllers/url.controller');
 
-// Create Short URL
 router.post("/shorten", controller.shortenUrl);
 
-// Redirect
+router.get("/analytics/:code", controller.getAnalytics);
+
 router.get("/:code", controller.redirectUrl);
 
 module.exports = router;

@@ -32,3 +32,13 @@ exports.findByCode = async(code) => {
     return Url.findOne({shortCode : code});
 };
 
+exports.recordAccess = async (code) => {
+    return Url.findOneAndUpdate(
+        { shortCode: code },
+        {
+            $inc: { clickCount: 1 },
+            $set: { lastAccessedAt: new Date() }
+        },
+        { new: true }
+    );
+};
